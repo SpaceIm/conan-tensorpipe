@@ -61,6 +61,8 @@ class TensorpipeConan(ConanFile):
             del self.options.cuda_ipc
         if self.settings.compiler.get_safe("cppstd"):
             tools.check_min_cppstd(self, 14)
+        if self.settings.os == "Windows":
+            raise ConanInvalidConfiguration("tensorpipe doesn't support Windows")
 
     def requirements(self):
         self.requires("libnop/cci.20200728")
