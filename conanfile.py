@@ -39,7 +39,7 @@ class TensorpipeConan(ConanFile):
     }
 
     exports_sources = "CMakeLists.txt"
-    generators = "cmake"
+    generators = "cmake", "pkg_config"
     _cmake = None
 
     @property
@@ -70,7 +70,7 @@ class TensorpipeConan(ConanFile):
             self.requires("cuda/11.2")
 
     def build_requirements(self):
-        self.requires("pkgconf/1.7.3")
+        self.build_requires("pkgconf/1.7.3")
 
     def source(self):
         tools.get(**self.conan_data["sources"][self.version])
