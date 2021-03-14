@@ -47,8 +47,6 @@ class TensorpipeConan(ConanFile):
         return "source_subfolder"
 
     def config_options(self):
-        if self.settings.os == "Windows":
-            del self.options.fPIC
         if self.settings.os != "Linux":
             del self.options.ibv
             del self.options.shm
