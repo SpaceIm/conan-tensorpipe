@@ -38,7 +38,7 @@ class TensorpipeConan(ConanFile):
         "cma": True,
     }
 
-    exports_sources = "CMakeLists.txt"
+    exports_sources = ["CMakeLists.txt", "patches/**"]
     generators = "cmake", "pkg_config"
     _cmake = None
 
@@ -96,6 +96,8 @@ class TensorpipeConan(ConanFile):
         return self._cmake
 
     def build(self):
+        for patch in self.conan_data.get("patches", {}).get(self.version, []):
+            tools.patch(**patch)
         cmake = self._configure_cmake()
         cmake.build()
 
