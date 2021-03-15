@@ -31,11 +31,11 @@
 +)
 +
 +if(TP_ENABLE_CMA)
-+  list(APPEND ${TP_PUBLIC_HEADERS} channel/cma/factory.h)
++  set(TP_PUBLIC_HEADERS ${TP_PUBLIC_HEADERS} channel/cma/factory.h)
 +endif()
 +
 +if(TP_USE_CUDA)
-+  list(APPEND ${TP_PUBLIC_HEADERS}
++  set(TP_PUBLIC_HEADERS ${TP_PUBLIC_HEADERS}
 +    channel/cuda_context.h
 +    channel/cuda_basic/factory.h
 +    channel/cuda_gdr/error.h
@@ -45,16 +45,16 @@
 +  )
 +
 +  if(TP_ENABLE_CUDA_IPC)
-+    list(APPEND ${TP_PUBLIC_HEADERS} channel/cuda_ipc/factory.h)
++    set(TP_PUBLIC_HEADERS ${TP_PUBLIC_HEADERS} channel/cuda_ipc/factory.h)
 +  endif()
 +endif()
 +
 +if(TP_ENABLE_SHM)
-+  list(APPEND ${TP_PUBLIC_HEADERS} transport/shm/factory.h)
++  set(TP_PUBLIC_HEADERS ${TP_PUBLIC_HEADERS} transport/shm/factory.h)
 +endif()
 +
 +if(TP_ENABLE_IBV)
-+  list(APPEND ${TP_PUBLIC_HEADERS}
++  set(TP_PUBLIC_HEADERS ${TP_PUBLIC_HEADERS}
 +    transport/ibv/error.h
 +    transport/ibv/factory.h
 +    transport/ibv/utility.h
