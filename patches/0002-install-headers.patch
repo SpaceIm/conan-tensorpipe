@@ -1,320 +1,71 @@
 --- a/tensorpipe/CMakeLists.txt
 +++ b/tensorpipe/CMakeLists.txt
-@@ -4,23 +4,51 @@
- # This source code is licensed under the BSD-style license found in the
- # LICENSE file in the root directory of this source tree.
- 
--add_library(tensorpipe
--  ${TP_STATIC_OR_SHARED}
--  channel/error.cc
--  channel/helpers.cc
--  common/address.cc
--  common/error.cc
--  common/fd.cc
--  common/socket.cc
--  common/system.cc
--  core/context.cc
--  core/context_impl.cc
--  core/error.cc
--  core/listener.cc
--  core/listener_impl.cc
--  core/pipe.cc
--  core/pipe_impl.cc
--  transport/error.cc)
-+add_library(tensorpipe ${TP_STATIC_OR_SHARED})
-+
-+target_sources(tensorpipe
-+  PRIVATE
-+    channel/channel_boilerplate.h
-+    channel/channel_impl_boilerplate.h
-+    channel/channel.h
-+    channel/context_boilerplate.h
-+    channel/context_impl_boilerplate.h
-+    channel/error.cc
-+    channel/helpers.cc
-+    channel/helpers.h
-+    common/address.cc
-+    common/address.h
-+    common/busy_polling_loop.h
-+    common/callback.h
-+    common/deferred_executor.h
-+    common/error.cc
-+    common/fd.cc
-+    common/socket.cc
-+    common/system.cc
-+    core/context.cc
-+    core/context_impl.cc
-+    core/error.cc
-+    core/listener.cc
-+    core/listener_impl.cc
-+    core/pipe.cc
-+    core/pipe_impl.cc
-+    transport/error.cc
-+  PUBLIC
-+    tensorpipe.h
-+    channel/context.h
-+    channel/cpu_context.h
-+    channel/error.h
-+    common/cpu_buffer.h
-+    common/error.h
-+    core/buffer.h
-+    core/context.h
-+    core/error.h
-+    core/listener.h
-+    core/message.h
-+    core/pipe.h
-+    transport/context.h
-+    transport/error.h
-+)
- 
- # Support `#include <tensorpipe/foo.h>`.
- target_include_directories(tensorpipe PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}>)
-@@ -33,25 +61,37 @@ target_include_directories(tensorpipe PUBLIC $<BUILD_INTERFACE:${PROJECT_BINARY_
- 
- ### basic
- 
--target_sources(tensorpipe PRIVATE
--  channel/basic/channel_impl.cc
--  channel/basic/context_impl.cc
--  channel/basic/factory.cc)
-+target_sources(tensorpipe
-+  PRIVATE
-+    channel/basic/channel_impl.cc
-+    channel/basic/context_impl.cc
-+    channel/basic/factory.cc
-+  PUBLIC
-+    channel/basic/factory.h
-+)
- 
- ### xth
- 
--target_sources(tensorpipe PRIVATE
--  channel/xth/channel_impl.cc
--  channel/xth/context_impl.cc
--  channel/xth/factory.cc)
-+target_sources(tensorpipe
-+  PRIVATE
-+    channel/xth/channel_impl.cc
-+    channel/xth/context_impl.cc
-+    channel/xth/factory.cc
-+  PUBLIC
-+    channel/xth/factory.h
-+)
- 
- ### cma
- 
- if(TP_ENABLE_CMA)
--  target_sources(tensorpipe PRIVATE
--    channel/cma/channel_impl.cc
--    channel/cma/context_impl.cc
--    channel/cma/factory.cc)
-+  target_sources(tensorpipe
-+    PRIVATE
-+      channel/cma/channel_impl.cc
-+      channel/cma/context_impl.cc
-+      channel/cma/factory.cc
-+    PUBLIC
-+      channel/cma/factory.h
-+  )
-   set(TENSORPIPE_HAS_CMA_CHANNEL 1)
- else()
-   set(TENSORPIPE_HAS_CMA_CHANNEL 0)
-@@ -59,10 +99,14 @@ endif()
- 
- ### mpt
- 
--target_sources(tensorpipe PRIVATE
--  channel/mpt/channel_impl.cc
--  channel/mpt/context_impl.cc
--  channel/mpt/factory.cc)
-+target_sources(tensorpipe
-+  PRIVATE
-+    channel/mpt/channel_impl.cc
-+    channel/mpt/context_impl.cc
-+    channel/mpt/factory.cc
-+  PUBLIC
-+    channel/mpt/factory.h
-+)
- 
- ## CUDA channels
- 
-@@ -74,35 +118,54 @@ if(TP_USE_CUDA)
- 
-   ### cuda_xth
- 
--  target_sources(tensorpipe PRIVATE
--    channel/cuda_xth/channel_impl.cc
--    channel/cuda_xth/context_impl.cc
--    channel/cuda_xth/factory.cc)
-+  target_sources(tensorpipe
-+    PRIVATE
-+      channel/cuda_xth/channel_impl.cc
-+      channel/cuda_xth/context_impl.cc
-+      channel/cuda_xth/factory.cc
-+    PUBLIC
-+      channel/cuda_xth/factory.h
-+  )
- 
-   ### cuda_basic
- 
--  target_sources(tensorpipe PRIVATE
--    channel/cuda_basic/channel_impl.cc
--    channel/cuda_basic/context_impl.cc
--    channel/cuda_basic/factory.cc
--    common/cuda_host_allocator.cc
--    common/cuda_loop.cc)
-+  target_sources(tensorpipe
-+    PRIVATE
-+      channel/cuda_basic/channel_impl.cc
-+      channel/cuda_basic/context_impl.cc
-+      channel/cuda_basic/factory.cc
-+      common/cuda_host_allocator.cc
-+      common/cuda_loop.cc
-+    PRIVATE
-+      channel/cuda_context.h
-+      channel/cuda_basic/factory.h
-+      common/cuda_buffer.h
-+  )
- 
-   ### cuda_ipc
- 
-   if(TP_ENABLE_CUDA_IPC)
--    target_sources(tensorpipe PRIVATE
--      channel/cuda_ipc/channel_impl.cc
--      channel/cuda_ipc/context_impl.cc
--      channel/cuda_ipc/factory.cc)
-+    target_sources(tensorpipe
-+      PRIVATE
-+        channel/cuda_ipc/channel_impl.cc
-+        channel/cuda_ipc/context_impl.cc
-+        channel/cuda_ipc/factory.cc
-+      PRIVATE
-+        channel/cuda_ipc/factory.h
-+    )
-     set(TENSORPIPE_HAS_CUDA_IPC_CHANNEL 1)
-   endif()
- 
--  target_sources(tensorpipe PRIVATE
--    common/ibv.cc
--    channel/cuda_gdr/channel_impl.cc
--    channel/cuda_gdr/context_impl.cc
--    channel/cuda_gdr/factory.cc)
-+  target_sources(tensorpipe
-+    PRIVATE
-+      common/ibv.cc
-+      channel/cuda_gdr/channel_impl.cc
-+      channel/cuda_gdr/context_impl.cc
-+      channel/cuda_gdr/factory.cc
-+    PRIVATE
-+      channel/cuda_gdr/error.h
-+      channel/cuda_gdr/factory.h
-+  )
-   set(TENSORPIPE_HAS_CUDA_GDR_CHANNEL 1)
- endif()
- 
-@@ -110,31 +173,41 @@ endif()
- 
- ### uv
- 
--target_sources(tensorpipe PRIVATE
--  transport/uv/connection_impl.cc
--  transport/uv/context_impl.cc
--  transport/uv/error.cc
--  transport/uv/factory.cc
--  transport/uv/listener_impl.cc
--  transport/uv/loop.cc
--  transport/uv/sockaddr.cc
--  transport/uv/utility.cc)
-+target_sources(tensorpipe
-+  PRIVATE
-+    transport/uv/connection_impl.cc
-+    transport/uv/context_impl.cc
-+    transport/uv/error.cc
-+    transport/uv/factory.cc
-+    transport/uv/listener_impl.cc
-+    transport/uv/loop.cc
-+    transport/uv/sockaddr.cc
-+    transport/uv/utility.cc
-+  PUBLIC
-+    transport/uv/error.h
-+    transport/uv/factory.h
-+    transport/uv/utility.h
-+)
- find_package(uv REQUIRED)
- target_link_libraries(tensorpipe PRIVATE uv::uv)
- 
- ### shm
- 
- if(TP_ENABLE_SHM)
--  target_sources(tensorpipe PRIVATE
--    common/epoll_loop.cc
--    transport/shm/connection_impl.cc
--    transport/shm/context_impl.cc
--    transport/shm/factory.cc
--    transport/shm/listener_impl.cc
--    transport/shm/reactor.cc
--    transport/shm/sockaddr.cc
--    util/ringbuffer/shm.cc
--    util/shm/segment.cc)
-+  target_sources(tensorpipe
-+    PRIVATE
-+      common/epoll_loop.cc
-+      transport/shm/connection_impl.cc
-+      transport/shm/context_impl.cc
-+      transport/shm/factory.cc
-+      transport/shm/listener_impl.cc
-+      transport/shm/reactor.cc
-+      transport/shm/sockaddr.cc
-+      util/ringbuffer/shm.cc
-+      util/shm/segment.cc
-+    PUBLIC
-+      transport/shm/factory.h
-+  )
-   set(TENSORPIPE_HAS_SHM_TRANSPORT 1)
- else()
-   set(TENSORPIPE_HAS_SHM_TRANSPORT 0)
-@@ -143,17 +216,23 @@ endif()
- ### ibv
- 
- if(TP_ENABLE_IBV)
--  target_sources(tensorpipe PRIVATE
--    common/epoll_loop.cc
--    common/ibv.cc
--    transport/ibv/connection_impl.cc
--    transport/ibv/context_impl.cc
--    transport/ibv/error.cc
--    transport/ibv/factory.cc
--    transport/ibv/listener_impl.cc
--    transport/ibv/reactor.cc
--    transport/ibv/sockaddr.cc
--    transport/ibv/utility.cc)
-+  target_sources(tensorpipe
-+    PRIVATE
-+      common/epoll_loop.cc
-+      common/ibv.cc
-+      transport/ibv/connection_impl.cc
-+      transport/ibv/context_impl.cc
-+      transport/ibv/error.cc
-+      transport/ibv/factory.cc
-+      transport/ibv/listener_impl.cc
-+      transport/ibv/reactor.cc
-+      transport/ibv/sockaddr.cc
-+      transport/ibv/utility.cc
-+    PUBLIC
-+      transport/ibv/error.h
-+      transport/ibv/factory.h
-+      transport/ibv/utility.h
-+  )
-   set(TENSORPIPE_HAS_IBV_TRANSPORT 1)
- endif()
- 
-@@ -208,4 +287,8 @@ endif()
- install(TARGETS tensorpipe
+@@ -209,3 +209,68 @@ install(TARGETS tensorpipe
          EXPORT TensorpipeTargets
          LIBRARY DESTINATION ${TP_INSTALL_LIBDIR}
--        ARCHIVE DESTINATION ${TP_INSTALL_LIBDIR})
-+        ARCHIVE DESTINATION ${TP_INSTALL_LIBDIR}
-+        PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/tensorpipe)
+         ARCHIVE DESTINATION ${TP_INSTALL_LIBDIR})
++
++### Public headers
++
++set(TP_PUBLIC_HEADERS
++  tensorpipe.h
++  channel/context.h
++  channel/cpu_context.h
++  channel/error.h
++  channel/basic/factory.h
++  channel/mpt/factory.h
++  channel/xth/factory.h
++  common/cpu_buffer.h
++  common/error.h
++  core/buffer.h
++  core/context.h
++  core/error.h
++  core/listener.h
++  core/message.h
++  core/pipe.h
++  transport/context.h
++  transport/error.h
++  transport/uv/error.h
++  transport/uv/factory.h
++  transport/uv/utility.h
++)
++
++if(TP_ENABLE_CMA)
++  set(TP_PUBLIC_HEADERS ${TP_PUBLIC_HEADERS} channel/cma/factory.h)
++endif()
++
++if(TP_USE_CUDA)
++  set(TP_PUBLIC_HEADERS ${TP_PUBLIC_HEADERS}
++    channel/cuda_context.h
++    channel/cuda_basic/factory.h
++    channel/cuda_gdr/error.h
++    channel/cuda_gdr/factory.h
++    channel/cuda_xth/factory.h
++    common/cuda_buffer.h
++  )
++
++  if(TP_ENABLE_CUDA_IPC)
++    set(TP_PUBLIC_HEADERS ${TP_PUBLIC_HEADERS} channel/cuda_ipc/factory.h)
++  endif()
++endif()
++
++if(TP_ENABLE_SHM)
++  set(TP_PUBLIC_HEADERS ${TP_PUBLIC_HEADERS} transport/shm/factory.h)
++endif()
++
++if(TP_ENABLE_IBV)
++  set(TP_PUBLIC_HEADERS ${TP_PUBLIC_HEADERS}
++    transport/ibv/error.h
++    transport/ibv/factory.h
++    transport/ibv/utility.h
++  )
++endif()
++
++foreach(_header_file ${TP_PUBLIC_HEADERS})
++  get_filename_component(_TP_HEADER_SUBDIR "${_header_file}" DIRECTORY)
++  install(FILES ${_header_file}
++          DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/tensorpipe/${_TP_HEADER_SUBDIR})
++endforeach()
 +
 +install(FILES ${CMAKE_CURRENT_BINARY_DIR}/config.h
 +        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/tensorpipe)
